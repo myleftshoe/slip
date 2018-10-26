@@ -73,13 +73,6 @@
 
 export const Slip = (function(){
 
-    var damnYouChrome = /Chrome\/[3-5]/.test(navigator.userAgent); // For bugs that can't be programmatically detected :( Intended to catch all versions of Chrome 30-40
-    var needsBodyHandlerHack = damnYouChrome; // Otherwise I _sometimes_ don't get any touchstart events and only clicks instead.
-
-    /* When dragging elements down in Chrome (tested 34-37) dragged element may appear below stationary elements.
-       Looks like WebKit bug #61824, but iOS Safari doesn't have that problem. */
-    var compositorDoesNotOrderLayers = damnYouChrome;
-
     // -webkit-mess
     var testElementStyle = document.createElement('div').style;
 
@@ -88,20 +81,11 @@ export const Slip = (function(){
     var transformCSSPropertyName = transformJSPropertyName === "webkitTransform" ? "-webkit-transform" : "transform";
     var userSelectJSPropertyName = "userSelect" in testElementStyle ? "userSelect" : "webkitUserSelect";
 
-    var globalInstances = 0;
-    var attachedBodyHandlerHack = false;
-    var nullHandler = function(){};
-
-    function Slip(container, options) {
+    function Slip(container) {
         if ('string' === typeof container) container = document.querySelector(container);
         if (!container || !container.addEventListener) throw new Error("Please specify DOM node to attach to");
 
-        if (!this || this === window) return new Slip(container, options);
-
-        this.options = options = options || {};
-        this.options.ignoredElements = options.ignoredElements || [];
-
-        if (!Array.isArray(this.options.ignoredElements)) throw new Error("ignoredElements must be an Array");
+        if (!this || this === window) return new Slip(container);
 
         // Functions used for as event handlers need usable `this` and must not change to be removable
         this.cancel = this.setState.bind(this, this.states.idle);
@@ -155,7 +139,6 @@ export const Slip = (function(){
     Slip.prototype = {
 
         container: null,
-        options: {},
         state: null,
 
         target: null, // the tapped/swiped/reordered node with height and backed up styles
@@ -238,30 +221,7 @@ export const Slip = (function(){
 
                 this.target.height = this.target.node.offsetHeight;
 
-                var nodes;
-                if (this.options.ignoredElements.length) {
-                    var container = this.container;
-                    var query = container.tagName.toLowerCase();
-                    if (container.getAttribute('id')) {
-                        query = '#' + container.getAttribute('id');
-                    } else if (container.classList.length) {
-                        query += '.' + container.getAttribute('class').replace(' ', '.');
-                    }
-                    query += ' > ';
-                    this.options.ignoredElements.forEach(function (selector) {
-                        query += ':not(' + selector + ')';
-                    });
-                    try {
-                        nodes = container.parentNode.querySelectorAll(query);
-                    } catch(err) {
-                        if (err instanceof DOMException && err.name === 'SyntaxError')
-                            throw new Error('ignoredElements you specified contain invalid query');
-                        else
-                            throw err;
-                    }
-                } else {
-                    nodes = this.container.childNodes;
-                }
+                var nodes = this.container.childNodes;
                 var originalIndex = findIndex(this.target, nodes);
                 var mouseOutsideTimer;
                 var zero = this.target.node.offsetTop + this.target.height/2;
@@ -280,10 +240,6 @@ export const Slip = (function(){
                 this.target.node.classList.add('slip-reordering');
                 this.target.node.style.zIndex = '99999';
                 this.target.node.style[userSelectJSPropertyName] = 'none';
-                if (compositorDoesNotOrderLayers) {
-                    // Chrome's compositor doesn't sort 2D layers
-                    this.container.style.webkitTransformStyle = 'preserve-3d';
-                }
 
                 function onMove() {
                     /*jshint validthis:true */
@@ -298,7 +254,7 @@ export const Slip = (function(){
                     var move = this.getTotalMovement();
                     this.target.node.style[transformJSPropertyName] = 'translate(0,' + move.y + 'px) ' + this.target.baseTransform.value;
 
-                    var height = this.target.height;
+                    var height = this.target.height + 2;
                     otherNodes.forEach(function(o){
                         var off = 0;
                         if (o.pos < 0 && move.y < 0 && o.pos > move.y) {
@@ -318,10 +274,6 @@ export const Slip = (function(){
                 return {
                     leaveState: function() {
                         if (mouseOutsideTimer) clearTimeout(mouseOutsideTimer);
-
-                        if (compositorDoesNotOrderLayers) {
-                            this.container.style.webkitTransformStyle = '';
-                        }
 
                         if (this.container.focus) {
                             this.container.focus();
@@ -384,15 +336,7 @@ export const Slip = (function(){
         },
 
         attach: function(container) {
-            globalInstances++;
             if (this.container) this.detach();
-
-            // In some cases taps on list elements send *only* click events and no touch events. Spotted only in Chrome 32+
-            // Having event listener on body seems to solve the issue (although AFAIK may disable smooth scrolling as a side-effect)
-            if (!attachedBodyHandlerHack && needsBodyHandlerHack) {
-                attachedBodyHandlerHack = true;
-                document.body.addEventListener('touchstart', nullHandler, false);
-            }
 
             this.container = container;
 
@@ -423,11 +367,6 @@ export const Slip = (function(){
 
             document.removeEventListener("selectionchange", this.onSelection, false);
 
-            globalInstances--;
-            if (!globalInstances && attachedBodyHandlerHack) {
-                attachedBodyHandlerHack = false;
-                document.body.removeEventListener('touchstart', nullHandler, false);
-            }
         },
 
         setState: function(newStateCtor){

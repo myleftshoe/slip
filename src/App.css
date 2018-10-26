@@ -2,6 +2,10 @@ body {
   touch-action: pan-y; /* allow vertical scroll but prevent swipe to go back in msEdge */
 }
 
+.draggable-container {
+  position: relative; /* Required by react-flip-move - uncomment it to see console warning */
+}
+
 .draggable-item {
   /* transition: all 2.18s ease; */
   position: relative; /* ensures that item is above all others in chrome */
@@ -10,7 +14,7 @@ body {
   text-align: center;
   width : 100%;
   display: block;
-  background-color: sienna;
+  background-color: tomato;
   border: 1px solid rgba(0,0,0,.125);
   margin-bottom: 2px;
   margin-top: 2px;
