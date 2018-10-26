@@ -104,7 +104,7 @@ export const Slip = (function(){
     }
 
     function getTransform(node) {
-        var transform = node.style[transformJSPropertyName];
+        const transform = node.style[transformJSPropertyName];
         if (transform) {
             return {
                 value: transform,
@@ -113,17 +113,17 @@ export const Slip = (function(){
         }
 
         if (window.getComputedStyle) {
-            var style = window.getComputedStyle(node).getPropertyValue(transformCSSPropertyName);
+            const style = window.getComputedStyle(node).getPropertyValue(transformCSSPropertyName);
             if (style && style !== 'none') return {value:style, original:''};
         }
         return {value:'', original:''};
     }
 
     function findIndex(target, nodes) {
-      var originalIndex = 0;
-      var listCount = 0;
+      let originalIndex = 0;
+      let listCount = 0;
 
-      for (var i=0; i < nodes.length; i++) {
+      for (let i=0; i < nodes.length; i++) {
         if (nodes[i].nodeType === 1) {
           listCount++;
           if (nodes[i] === target.node) {
@@ -170,14 +170,15 @@ export const Slip = (function(){
                 this.target.height = this.target.node.offsetHeight;
                 this.target.node.style.willChange = transformCSSPropertyName;
                 this.target.node.style[transitionJSPropertyName] = '';
-
+                
+                let holdTimer;
                 if (!this.dispatch(this.target.originalTarget, 'beforewait')) {
                     if (this.dispatch(this.target.originalTarget, 'beforereorder')) {
                         this.setState(this.states.reorder);
                     }
                 } else {
-                    var holdTimer = setTimeout(function(){
-                        var move = this.getAbsoluteMovement();
+                    holdTimer = setTimeout(function(){
+                        const move = this.getAbsoluteMovement();
                         if (this.canPreventScrolling && move.x < 15 && move.y < 25) {
                             if (this.dispatch(this.target.originalTarget, 'beforereorder')) {
                                 this.setState(this.states.reorder);
@@ -192,7 +193,7 @@ export const Slip = (function(){
                     },
 
                     onMove: function() {
-                        var move = this.getAbsoluteMovement();
+                        const move = this.getAbsoluteMovement();
 
                         if (move.y > 20) {
                             this.setState(this.states.idle);
@@ -207,7 +208,7 @@ export const Slip = (function(){
                     },
 
                     onEnd: function() {
-                        var allowDefault = this.dispatch(this.target.originalTarget, 'tap');
+                        const allowDefault = this.dispatch(this.target.originalTarget, 'tap');
                         this.setState(this.states.idle);
                         return allowDefault;
                     },
@@ -221,14 +222,14 @@ export const Slip = (function(){
 
                 this.target.height = this.target.node.offsetHeight;
 
-                var nodes = this.container.childNodes;
-                var originalIndex = findIndex(this.target, nodes);
-                var mouseOutsideTimer;
-                var zero = this.target.node.offsetTop + this.target.height/2;
-                var otherNodes = [];
-                for(var i=0; i < nodes.length; i++) {
+                const nodes = this.container.childNodes;
+                const originalIndex = findIndex(this.target, nodes);
+                let mouseOutsideTimer;
+                const zero = this.target.node.offsetTop + this.target.height/2;
+                const otherNodes = [];
+                for(let i=0; i < nodes.length; i++) {
                     if (nodes[i].nodeType !== 1 || nodes[i] === this.target.node) continue;
-                    var t = nodes[i].offsetTop;
+                    const t = nodes[i].offsetTop;
                     nodes[i].style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.2s ease-in-out';
                     otherNodes.push({
                         node: nodes[i],
@@ -251,12 +252,12 @@ export const Slip = (function(){
                         clearTimeout(mouseOutsideTimer); mouseOutsideTimer = null;
                     }
 
-                    var move = this.getTotalMovement();
+                    const move = this.getTotalMovement();
                     this.target.node.style[transformJSPropertyName] = 'translate(0,' + move.y + 'px) ' + this.target.baseTransform.value;
 
-                    var height = this.target.height + 2;
+                    const height = this.target.height + 2;
                     otherNodes.forEach(function(o){
-                        var off = 0;
+                        let off = 0;
                         if (o.pos < 0 && move.y < 0 && o.pos > move.y) {
                             off = height;
                         }
@@ -304,8 +305,8 @@ export const Slip = (function(){
                     },
 
                     onEnd: function() {
-                        var move = this.getTotalMovement();
-                        var i, spliceIndex;
+                        const move = this.getTotalMovement();
+                        let i, spliceIndex;
                         if (move.y < 0) {
                             for (i=0; i < otherNodes.length; i++) {
                                 if (otherNodes[i].pos > move.y) {
@@ -376,8 +377,8 @@ export const Slip = (function(){
             }
 
             // Must be re-entrant in case ctor changes state
-            var prevState = this.state;
-            var nextState = newStateCtor.call(this);
+            const prevState = this.state;
+            let nextState = newStateCtor.call(this);
             if (this.state === prevState) {
                 nextState.ctor = newStateCtor;
                 this.state = nextState;
@@ -397,8 +398,8 @@ export const Slip = (function(){
 
         onSelection: function(e) {
             e.stopPropagation();
-            var isRelated = e.target === document || this.findTargetNode(e);
-            var iOS = /(iPhone|iPad|iPod)/i.test(navigator.userAgent) && !/(Android|Windows)/i.test(navigator.userAgent);
+            const isRelated = e.target === document || this.findTargetNode(e);
+            const iOS = /(iPhone|iPad|iPod)/i.test(navigator.userAgent) && !/(Android|Windows)/i.test(navigator.userAgent);
             if (!isRelated) return;
 
             if (iOS) {
@@ -480,14 +481,14 @@ export const Slip = (function(){
         },
 
         setTarget: function(e) {
-            var targetNode = this.findTargetNode(e.target);
+            const targetNode = this.findTargetNode(e.target);
             if (!targetNode) {
                 this.setState(this.states.idle);
                 return false;
             }
 
             //check for a scrollable parent
-            var scrollContainer = targetNode.parentNode;
+            let scrollContainer = targetNode.parentNode;
             while (scrollContainer) {
                 if (scrollContainer === document.body) break;
                 if (scrollContainer.scrollHeight > scrollContainer.clientHeight && window.getComputedStyle(scrollContainer)['overflow-y'] !== 'visible') break;
@@ -569,7 +570,7 @@ export const Slip = (function(){
         },
 
         getTotalMovement: function() {
-            var scrollOffset = this.target.scrollContainer.scrollTop - this.target.origScrollTop;
+            const scrollOffset = this.target.scrollContainer.scrollTop - this.target.origScrollTop;
             return {
                 x: this.latestPosition.x - this.startPosition.x,
                 y: this.latestPosition.y - this.startPosition.y + scrollOffset,
@@ -578,7 +579,7 @@ export const Slip = (function(){
         },
 
         getAbsoluteMovement: function() {
-            var move = this.getTotalMovement();
+            const move = this.getTotalMovement();
             return {
                 x: Math.abs(move.x),
                 y: Math.abs(move.y),
@@ -589,10 +590,10 @@ export const Slip = (function(){
         },
 
         updateScrolling: function() {
-            var triggerOffset = 40,
+            let triggerOffset = 40,
                 offset = 0;
 
-            var scrollable = this.target.scrollContainer,
+            const scrollable = this.target.scrollContainer,
                 containerRect = scrollable.getBoundingClientRect(),
                 targetRect = this.target.node.getBoundingClientRect(),
                 bottomOffset = Math.min(containerRect.bottom, window.innerHeight) - targetRect.bottom,
@@ -610,7 +611,7 @@ export const Slip = (function(){
         },
 
         dispatch: function(targetNode, eventName, detail) {
-            var event = document.createEvent('CustomEvent');
+            let event = document.createEvent('CustomEvent');
             if (event && event.initCustomEvent) {
                 event.initCustomEvent('slip:' + eventName, true, true, detail);
             } else {
@@ -635,15 +636,5 @@ export const Slip = (function(){
         },
     };
 
-    // // AMD
-    // if ('function' === typeof define && define.amd) {
-    //     define(function(){
-    //         return Slip;
-    //     });
-    // }
-    // // CJS
-    // if ('object' === typeof module && module.exports) {
-    //     module.exports = Slip;
-    // }
     return Slip;
 })();
