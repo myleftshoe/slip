@@ -88,11 +88,6 @@ export const Slip = (function(){
     var transformCSSPropertyName = transformJSPropertyName === "webkitTransform" ? "-webkit-transform" : "transform";
     var userSelectJSPropertyName = "userSelect" in testElementStyle ? "userSelect" : "webkitUserSelect";
 
-    testElementStyle[transformJSPropertyName] = 'translateZ(0)';
-    var hwLayerMagicStyle = testElementStyle[transformJSPropertyName] ? 'translateZ(0) ' : '';
-    var hwTopLayerMagicStyle = testElementStyle[transformJSPropertyName] ? 'translateZ(1px) ' : '';
-    testElementStyle = null;
-
     var globalInstances = 0;
     var attachedBodyHandlerHack = false;
     var nullHandler = function(){};
@@ -301,7 +296,7 @@ export const Slip = (function(){
                     }
 
                     var move = this.getTotalMovement();
-                    this.target.node.style[transformJSPropertyName] = 'translate(0,' + move.y + 'px) ' + hwTopLayerMagicStyle + this.target.baseTransform.value;
+                    this.target.node.style[transformJSPropertyName] = 'translate(0,' + move.y + 'px) ' + this.target.baseTransform.value;
 
                     var height = this.target.height;
                     otherNodes.forEach(function(o){
@@ -313,7 +308,7 @@ export const Slip = (function(){
                             off = -height;
                         }
                         // FIXME: should change accelerated/non-accelerated state lazily
-                        o.node.style[transformJSPropertyName] = off ? 'translate(0,'+off+'px) ' + hwLayerMagicStyle + o.baseTransform.value : o.baseTransform.original;
+                        o.node.style[transformJSPropertyName] = off ? 'translate(0,'+off+'px) ' + o.baseTransform.value : o.baseTransform.original;
                     });
                     return false;
                 }
@@ -687,25 +682,12 @@ export const Slip = (function(){
             return targetNode.dispatchEvent(event);
         },
 
-        getSiblings: function(target) {
-            var siblings = [];
-            var tmp = target.node.nextSibling;
-            while(tmp) {
-                if (tmp.nodeType === 1) siblings.push({
-                    node: tmp,
-                    baseTransform: getTransform(tmp),
-                });
-                tmp = tmp.nextSibling;
-            }
-            return siblings;
-        },
-
         animateToZero: function(callback, target) {
             // save, because this.target/container could change during animation
             target = target || this.target;
 
             target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.1s ease-out';
-            target.node.style[transformJSPropertyName] = 'translate(0,0) ' + hwLayerMagicStyle + target.baseTransform.value;
+            target.node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
             setTimeout(function(){
                 target.node.style[transitionJSPropertyName] = '';
                 target.node.style[transformJSPropertyName] = target.baseTransform.original;
