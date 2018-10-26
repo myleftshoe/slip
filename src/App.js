@@ -8,7 +8,7 @@ const generateItems = length => [...Array(length).keys()].map(k => `Item ${k}`)
 class App extends Component {
 
   state = {
-    items: generateItems(10),
+    items: generateItems(80),
     reordering: false
   }
   

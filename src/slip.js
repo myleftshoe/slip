@@ -255,7 +255,7 @@ export const Slip = (function(){
                     const move = this.getTotalMovement();
                     this.target.node.style[transformJSPropertyName] = 'translate(0,' + move.y + 'px) ' + this.target.baseTransform.value;
 
-                    const height = this.target.height + 2;
+                    const height = this.target.height + 2; // +2 for margin
                     otherNodes.forEach(function(o){
                         let off = 0;
                         if (o.pos < 0 && move.y < 0 && o.pos > move.y) {
@@ -280,7 +280,7 @@ export const Slip = (function(){
                             this.container.focus();
                         }
 
-                        this.target.node.classList.remove('slip-reordering');
+                        // this.target.node.classList.remove('slip-reordering');
                         this.target.node.style[userSelectJSPropertyName] = '';
 
                         this.animateToZero(function(target){
@@ -626,13 +626,21 @@ export const Slip = (function(){
             // save, because this.target/container could change during animation
             target = target || this.target;
 
-            target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.1s ease-out';
+            // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.1s ease-out';
+            // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.0s';
             target.node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
             setTimeout(function(){
                 target.node.style[transitionJSPropertyName] = '';
                 target.node.style[transformJSPropertyName] = target.baseTransform.original;
+                target.node.classList.remove('slip-reordering');
+                target.node.classList.add('slip-reordered');
+                const fn = e => {
+                    target.node.classList.remove('slip-reordered');
+                    target.node.removeEventListener("transitionend", fn, false);
+                }
+                target.node.addEventListener("transitionend", fn, false);
                 if (callback) callback.call(this, target);
-            }.bind(this), 101);
+            }.bind(this), 100);
         },
     };
 
