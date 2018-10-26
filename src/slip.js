@@ -3,24 +3,6 @@
 
     Fires these events on list elements:
 
-        • slip:swipe
-            When swipe has been done and user has lifted finger off the screen.
-            If you execute event.preventDefault() the element will be animated back to original position.
-            Otherwise it will be animated off the list and set to display:none.
-
-        • slip:beforeswipe
-            Fired before first swipe movement starts.
-            If you execute event.preventDefault() then element will not move at all.
-
-        • slip:cancelswipe
-            Fired after the user has started to swipe, but lets go without actually swiping left or right.
-
-        • slip:animateswipe
-            Fired while swiping, before the user has let go of the element.
-            event.detail.x contains the amount of movement in the x direction.
-            If you execute event.preventDefault() then the element will not move to this position.
-            This can be useful for saturating the amount of swipe, or preventing movement in one direction, but allowing it in the other.
-
         • slip:reorder
             Element has been dropped in new location. event.detail contains the following:
                 • insertBefore: DOM node before which element has been dropped (null is the end of the list). Use with node.insertBefore().
@@ -45,26 +27,6 @@
         CSS:
             You should set `user-select:none` (and WebKit prefixes, sigh) on list elements,
             otherwise unstoppable and glitchy text selection in iOS will get in the way.
-
-            You should set `overflow-x: hidden` on the container or body to prevent horizontal scrollbar
-            appearing when elements are swiped off the list.
-
-
-        var list = document.querySelector('ul#slippylist');
-        new Slip(list);
-
-        list.addEventListener('slip:beforeswipe', function(e) {
-            if (shouldNotSwipe(e.target)) e.preventDefault();
-        });
-
-        list.addEventListener('slip:swipe', function(e) {
-            // e.target swiped
-            if (thatWasSwipeToRemove) {
-                e.target.parentNode.removeChild(e.target);
-            } else {
-                e.preventDefault(); // will animate back to original position
-            }
-        });
 
         list.addEventListener('slip:beforereorder', function(e) {
             if (shouldNotReorder(e.target)) e.preventDefault();
@@ -110,21 +72,6 @@
 */
 
 export const Slip = (function(){
-    // 'use strict';
-
-    var accessibility = {
-        // Set values to false if you don't want Slip to manage them
-        container: {
-            ariaRole: "listbox",
-            tabIndex: 0,
-            focus: false, // focuses after drop
-        },
-        items: {
-            ariaRole: "option", // If "option" flattens items, try "group": https://www.marcozehe.de/2013/03/08/sometimes-you-have-to-use-illegal-wai-aria-to-make-stuff-work/
-            tabIndex: -1, // 0 will make every item tabbable, which isn't always useful
-            focus: false, // focuses when dragging
-        },
-    };
 
     var damnYouChrome = /Chrome\/[3-5]/.test(navigator.userAgent); // For bugs that can't be programmatically detected :( Intended to catch all versions of Chrome 30-40
     var needsBodyHandlerHack = damnYouChrome; // Otherwise I _sometimes_ don't get any touchstart events and only clicks instead.
@@ -157,9 +104,6 @@ export const Slip = (function(){
         if (!this || this === window) return new Slip(container, options);
 
         this.options = options = options || {};
-        this.options.keepSwipingPercent = options.keepSwipingPercent || 0;
-        this.options.minimumSwipeVelocity = options.minimumSwipeVelocity || 1;
-        this.options.minimumSwipeTime = options.minimumSwipeTime || 110;
         this.options.ignoredElements = options.ignoredElements || [];
 
         if (!Array.isArray(this.options.ignoredElements)) throw new Error("ignoredElements must be an Array");
@@ -272,14 +216,6 @@ export const Slip = (function(){
                     onMove: function() {
                         var move = this.getAbsoluteMovement();
 
-                        if (move.x > 20 && move.y < Math.max(100, this.target.height)) {
-                            if (this.dispatch(this.target.originalTarget, 'beforeswipe', {directionX: move.directionX, directionY: move.directionY})) {
-                                this.setState(this.states.swipe);
-                                return false;
-                            } else {
-                                this.setState(this.states.idle);
-                            }
-                        }
                         if (move.y > 20) {
                             this.setState(this.states.idle);
                         }
@@ -300,79 +236,8 @@ export const Slip = (function(){
                 };
             },
 
-            swipe: function swipeStateInit() {
-                var swipeSuccess = false;
-                var container = this.container;
-
-                var originalIndex = findIndex(this.target, this.container.childNodes);
-
-                container.classList.add('slip-swiping-container');
-                function removeClass() {
-                    container.classList.remove('slip-swiping-container');
-                }
-
-                this.target.height = this.target.node.offsetHeight;
-
-                return {
-                    leaveState: function() {
-                        if (swipeSuccess) {
-                            this.animateSwipe(function(target){
-                                target.node.style[transformJSPropertyName] = target.baseTransform.original;
-                                target.node.style[transitionJSPropertyName] = '';
-                                if (this.dispatch(target.node, 'afterswipe')) {
-                                    removeClass();
-                                    return true;
-                                } else {
-                                    this.animateToZero(undefined, target);
-                                }
-                            }.bind(this));
-                        } else {
-                            this.animateToZero(removeClass);
-                        }
-                    },
-
-                    onMove: function() {
-                        var move = this.getTotalMovement();
-
-                        if (Math.abs(move.y) < this.target.height+20) {
-                            if (this.dispatch(this.target.node, 'animateswipe', {x: move.x, originalIndex: originalIndex})) {
-                                this.target.node.style[transformJSPropertyName] = 'translate(' + move.x + 'px,0) ' + hwLayerMagicStyle + this.target.baseTransform.value;
-                            }
-                            return false;
-                        } else {
-                            this.dispatch(this.target.node, 'cancelswipe');
-                            this.setState(this.states.idle);
-                        }
-                    },
-
-                    onLeave: function() {
-                        this.state.onEnd.call(this);
-                    },
-
-                    onEnd: function() {
-                        var move = this.getAbsoluteMovement();
-                        var velocity = move.x / move.time;
-
-                        // How far out has the item been swiped?
-                        var swipedPercent = Math.abs((this.startPosition.x - this.previousPosition.x) / this.container.clientWidth) * 100;
-
-                        var swiped = (velocity > this.options.minimumSwipeVelocity && move.time > this.options.minimumSwipeTime) || (this.options.keepSwipingPercent && swipedPercent > this.options.keepSwipingPercent);
-
-                        if (swiped) {
-                            if (this.dispatch(this.target.node, 'swipe', {direction: move.directionX, originalIndex: originalIndex})) {
-                                swipeSuccess = true; // can't animate here, leaveState overrides anim
-                            }
-                        } else {
-                            this.dispatch(this.target.node, 'cancelswipe');
-                        }
-                        this.setState(this.states.idle);
-                        return !swiped;
-                    },
-                };
-            },
-
             reorder: function reorderStateInit() {
-                if (this.target.node.focus && accessibility.items.focus) {
+                if (this.target.node.focus) {
                     this.target.node.focus();
                 }
 
@@ -463,7 +328,7 @@ export const Slip = (function(){
                             this.container.style.webkitTransformStyle = '';
                         }
 
-                        if (this.container.focus && accessibility.container.focus) {
+                        if (this.container.focus) {
                             this.container.focus();
                         }
 
@@ -536,14 +401,6 @@ export const Slip = (function(){
 
             this.container = container;
 
-            // Accessibility
-            if (false !== accessibility.container.tabIndex) {
-                this.container.tabIndex = accessibility.container.tabIndex;
-            }
-            if (accessibility.container.ariaRole) {
-                this.container.setAttribute('aria-role', accessibility.container.ariaRole);
-            }
-            this.setChildNodesAriaRoles();
             this.container.addEventListener('focus', this.onContainerFocus, false);
 
             this.otherNodes = [];
@@ -570,14 +427,6 @@ export const Slip = (function(){
             this.container.removeEventListener('touchcancel', this.cancel, false);
 
             document.removeEventListener("selectionchange", this.onSelection, false);
-
-            if (false !== accessibility.container.tabIndex) {
-                this.container.removeAttribute('tabIndex');
-            }
-            if (accessibility.container.ariaRole) {
-                this.container.removeAttribute('aria-role');
-            }
-            this.unSetChildNodesAriaRoles();
 
             globalInstances--;
             if (!globalInstances && attachedBodyHandlerHack) {
@@ -610,34 +459,8 @@ export const Slip = (function(){
 
         onContainerFocus: function(e) {
             e.stopPropagation();
-            this.setChildNodesAriaRoles();
         },
 
-        setChildNodesAriaRoles: function() {
-            var nodes = this.container.childNodes;
-            for(var i=0; i < nodes.length; i++) {
-                if (nodes[i].nodeType !== 1) continue;
-                if (accessibility.items.ariaRole) {
-                    nodes[i].setAttribute('aria-role', accessibility.items.ariaRole);
-                }
-                if (false !== accessibility.items.tabIndex) {
-                    nodes[i].tabIndex = accessibility.items.tabIndex;
-                }
-            }
-        },
-
-        unSetChildNodesAriaRoles: function() {
-            var nodes = this.container.childNodes;
-            for(var i=0; i < nodes.length; i++) {
-                if (nodes[i].nodeType !== 1) continue;
-                if (accessibility.items.ariaRole) {
-                    nodes[i].removeAttribute('aria-role');
-                }
-                if (false !== accessibility.items.tabIndex) {
-                    nodes[i].removeAttribute('tabIndex');
-                }
-            }
-        },
         onSelection: function(e) {
             e.stopPropagation();
             var isRelated = e.target === document || this.findTargetNode(e);
@@ -887,37 +710,6 @@ export const Slip = (function(){
                 target.node.style[transitionJSPropertyName] = '';
                 target.node.style[transformJSPropertyName] = target.baseTransform.original;
                 if (callback) callback.call(this, target);
-            }.bind(this), 101);
-        },
-
-        animateSwipe: function(callback) {
-            var target = this.target;
-            var siblings = this.getSiblings(target);
-            var emptySpaceTransformStyle = 'translate(0,' + this.target.height + 'px) ' + hwLayerMagicStyle + ' ';
-
-            // FIXME: animate with real velocity
-            target.node.style[transitionJSPropertyName] = 'all 0.1s linear';
-            target.node.style[transformJSPropertyName] = ' translate(' + (this.getTotalMovement().x > 0 ? '' : '-') + '100%,0) ' + hwLayerMagicStyle + target.baseTransform.value;
-
-            setTimeout(function(){
-                if (callback.call(this, target)) {
-                    siblings.forEach(function(o){
-                        o.node.style[transitionJSPropertyName] = '';
-                        o.node.style[transformJSPropertyName] = emptySpaceTransformStyle + o.baseTransform.value;
-                    });
-                    setTimeout(function(){
-                        siblings.forEach(function(o){
-                            o.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.1s ease-in-out';
-                            o.node.style[transformJSPropertyName] = 'translate(0,0) ' + hwLayerMagicStyle + o.baseTransform.value;
-                        });
-                        setTimeout(function(){
-                            siblings.forEach(function(o){
-                                o.node.style[transitionJSPropertyName] = '';
-                                o.node.style[transformJSPropertyName] = o.baseTransform.original;
-                            });
-                        }, 101);
-                    }, 1);
-                }
             }.bind(this), 101);
         },
     };
