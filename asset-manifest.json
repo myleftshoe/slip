@@ -1,13 +1,13 @@
 {
-  "main.css": "/slip/static/css/main.ecc63a49.chunk.css",
-  "main.js": "/slip/static/js/main.b27364a8.chunk.js",
-  "main.js.map": "/slip/static/js/main.b27364a8.chunk.js.map",
+  "main.css": "/slip/static/css/main.11d33e2a.chunk.css",
+  "main.js": "/slip/static/js/main.8ec6c9b8.chunk.js",
+  "main.js.map": "/slip/static/js/main.8ec6c9b8.chunk.js.map",
   "static/js/1.8557f18b.chunk.js": "/slip/static/js/1.8557f18b.chunk.js",
   "static/js/1.8557f18b.chunk.js.map": "/slip/static/js/1.8557f18b.chunk.js.map",
   "runtime~main.js": "/slip/static/js/runtime~main.d8e0f861.js",
   "runtime~main.js.map": "/slip/static/js/runtime~main.d8e0f861.js.map",
-  "static/css/main.ecc63a49.chunk.css.map": "/slip/static/css/main.ecc63a49.chunk.css.map",
+  "static/css/main.11d33e2a.chunk.css.map": "/slip/static/css/main.11d33e2a.chunk.css.map",
   "index.html": "/slip/index.html",
-  "precache-manifest.a929f7585f8b368ec6ea66b2854ad034.js": "/slip/precache-manifest.a929f7585f8b368ec6ea66b2854ad034.js",
+  "precache-manifest.ceeea490bcf7c0e8faa98f4caa968716.js": "/slip/precache-manifest.ceeea490bcf7c0e8faa98f4caa968716.js",
   "service-worker.js": "/slip/service-worker.js"
 }
