@@ -74,12 +74,12 @@
 export const Slip = (function(){
 
     // -webkit-mess
-    var testElementStyle = document.createElement('div').style;
+    const testElementStyle = document.createElement('div').style;
 
-    var transitionJSPropertyName = "transition" in testElementStyle ? "transition" : "webkitTransition";
-    var transformJSPropertyName = "transform" in testElementStyle ? "transform" : "webkitTransform";
-    var transformCSSPropertyName = transformJSPropertyName === "webkitTransform" ? "-webkit-transform" : "transform";
-    var userSelectJSPropertyName = "userSelect" in testElementStyle ? "userSelect" : "webkitUserSelect";
+    const transitionJSPropertyName = "transition" in testElementStyle ? "transition" : "webkitTransition";
+    const transformJSPropertyName = "transform" in testElementStyle ? "transform" : "webkitTransform";
+    const transformCSSPropertyName = transformJSPropertyName === "webkitTransform" ? "-webkit-transform" : "transform";
+    const userSelectJSPropertyName = "userSelect" in testElementStyle ? "userSelect" : "webkitUserSelect";
 
     function Slip(container) {
         if ('string' === typeof container) container = document.querySelector(container);
