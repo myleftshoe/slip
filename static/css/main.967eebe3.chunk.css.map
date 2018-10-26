@@ -1,1 +1,0 @@
-{"version":3,"sources":["C:/Users/Paul/Documents/react/slip/src/C:/Users/Paul/Documents/react/slip/src/App.css"],"names":[],"mappings":"AAAA,KACE,kBAAoB,CACrB","file":"main.967eebe3.chunk.css","sourcesContent":["body {\n  touch-action: pan-y; /* allow vertical scroll but prevent swipe to go back in msEdge */\n}\n\n"]}
