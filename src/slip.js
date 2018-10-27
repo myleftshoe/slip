@@ -341,32 +341,32 @@ export const Slip = (function(){
 
             this.container = container;
 
-            this.container.addEventListener('focus', this.onContainerFocus, false);
+            this.container.addEventListener('focus', this.onContainerFocus, {passive:true, capture: false});
 
             this.otherNodes = [];
 
             // selection on iOS interferes with reordering
-            document.addEventListener("selectionchange", this.onSelection, false);
+            document.addEventListener("selectionchange", this.onSelection, {passive:false, capture: false});
 
             // cancel is called e.g. when iOS detects multitasking gesture
-            this.container.addEventListener('touchcancel', this.cancel, false);
-            this.container.addEventListener('touchstart', this.onTouchStart, false);
-            this.container.addEventListener('touchmove', this.onTouchMove, false);
-            this.container.addEventListener('touchend', this.onTouchEnd, false);
-            this.container.addEventListener('mousedown', this.onMouseDown, false);
+            this.container.addEventListener('touchcancel', this.cancel, {passive:true, capture: false});
+            this.container.addEventListener('touchstart', this.onTouchStart, {passive:true, capture: false});
+            this.container.addEventListener('touchmove', this.onTouchMove, {passive:false, capture: false});
+            this.container.addEventListener('touchend', this.onTouchEnd, {passive:false, capture: false});
+            this.container.addEventListener('mousedown', this.onMouseDown, {passive:true, capture: false});
             // mousemove and mouseup are attached dynamically
         },
 
         detach: function() {
             this.cancel();
 
-            this.container.removeEventListener('mousedown', this.onMouseDown, false);
-            this.container.removeEventListener('touchend', this.onTouchEnd, false);
-            this.container.removeEventListener('touchmove', this.onTouchMove, false);
-            this.container.removeEventListener('touchstart', this.onTouchStart, false);
-            this.container.removeEventListener('touchcancel', this.cancel, false);
+            this.container.removeEventListener('mousedown', this.onMouseDown, {passive:true, capture: false});
+            this.container.removeEventListener('touchend', this.onTouchEnd, {passive:false, capture: false});
+            this.container.removeEventListener('touchmove', this.onTouchMove, {passive:false, capture: false});
+            this.container.removeEventListener('touchstart', this.onTouchStart, {passive:true, capture: false});
+            this.container.removeEventListener('touchcancel', this.cancel, {passive:true, capture: false});
 
-            document.removeEventListener("selectionchange", this.onSelection, false);
+            document.removeEventListener("selectionchange", this.onSelection, {passive:false, capture: false});
 
         },
 
@@ -417,20 +417,20 @@ export const Slip = (function(){
             // but I don't need to listen to unrelated events all the time
             if (!this.mouseHandlersAttached) {
                 this.mouseHandlersAttached = true;
-                document.documentElement.addEventListener('mouseleave', this.onMouseLeave, false);
-                window.addEventListener('mousemove', this.onMouseMove, true);
-                window.addEventListener('mouseup', this.onMouseUp, true);
-                window.addEventListener('blur', this.cancel, false);
+                document.documentElement.addEventListener('mouseleave', this.onMouseLeave, {passive:true, capture: false});
+                window.addEventListener('mousemove', this.onMouseMove, {passive:false, capture: true});
+                window.addEventListener('mouseup', this.onMouseUp, {passive:false, capture: true});
+                window.addEventListener('blur', this.cancel, {passive:true, capture: false});
             }
         },
 
         removeMouseHandlers: function() {
             if (this.mouseHandlersAttached) {
                 this.mouseHandlersAttached = false;
-                document.documentElement.removeEventListener('mouseleave', this.onMouseLeave, false);
-                window.removeEventListener('mousemove', this.onMouseMove, true);
-                window.removeEventListener('mouseup', this.onMouseUp, true);
-                window.removeEventListener('blur', this.cancel, false);
+                document.documentElement.removeEventListener('mouseleave', this.onMouseLeave, {passive:true, capture: false});
+                window.removeEventListener('mousemove', this.onMouseMove, {passive:false, capture: true});
+                window.removeEventListener('mouseup', this.onMouseUp, {passive:false, capture: true});
+                window.removeEventListener('blur', this.cancel, {passive:true, capture: false});
             }
         },
 
