@@ -248,28 +248,29 @@ export const Slip = (function(){
 
                 function onMove() {
                     /*jshint validthis:true */
+                    requestAnimationFrame(() => {
+                        this.updateScrolling();
 
-                    this.updateScrolling();
-
-                    if (mouseOutsideTimer) {
-                        // don't care where the mouse is as long as it moves
-                        clearTimeout(mouseOutsideTimer); mouseOutsideTimer = null;
-                    }
-
-                    const move = this.getTotalMovement();
-                    this.target.node.style[transformJSPropertyName] = 'translate(0,' + move.y + 'px) ' + this.target.baseTransform.value;
-
-                    const height = this.target.height + 2; // +2 for margin
-                    otherNodes.forEach(function(o){
-                        let off = 0;
-                        if (o.pos < 0 && move.y < 0 && o.pos > move.y) {
-                            off = height;
+                        if (mouseOutsideTimer) {
+                            // don't care where the mouse is as long as it moves
+                            clearTimeout(mouseOutsideTimer); mouseOutsideTimer = null;
                         }
-                        else if (o.pos > 0 && move.y > 0 && o.pos < move.y) {
-                            off = -height;
-                        }
-                        // FIXME: should change accelerated/non-accelerated state lazily
-                        o.node.style[transformJSPropertyName] = off ? 'translate(0,'+off+'px) ' + o.baseTransform.value : o.baseTransform.original;
+
+                        const move = this.getTotalMovement();
+                        this.target.node.style[transformJSPropertyName] = 'translate(0,' + move.y + 'px) ' + this.target.baseTransform.value;
+
+                        const height = this.target.height + 2; // +2 for margin
+                        otherNodes.forEach(function(o){
+                            let off = 0;
+                            if (o.pos < 0 && move.y < 0 && o.pos > move.y) {
+                                off = height;
+                            }
+                            else if (o.pos > 0 && move.y > 0 && o.pos < move.y) {
+                                off = -height;
+                            }
+                            // FIXME: should change accelerated/non-accelerated state lazily
+                            o.node.style[transformJSPropertyName] = off ? 'translate(0,'+off+'px) ' + o.baseTransform.value : o.baseTransform.original;
+                        });
                     });
                     return false;
                 }
