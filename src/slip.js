@@ -228,15 +228,19 @@ export const Slip = (function(){
                 const zero = this.target.node.offsetTop + this.target.height/2;
                 const otherNodes = [];
                 for(let i=0; i < nodes.length; i++) {
-                    if (nodes[i].nodeType !== 1 || nodes[i] === this.target.node) continue;
+                    if (nodes[i].nodeType !== 1 || nodes[i] === this.target.node || i < originalIndex) continue;
                     const t = nodes[i].offsetTop;
                     nodes[i].style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.2s ease-in-out';
+                    if (i > originalIndex)
+                        nodes[i].style.willChange = transformCSSPropertyName; 
                     otherNodes.push({
                         node: nodes[i],
                         baseTransform: getTransform(nodes[i]),
                         pos: t + (t < zero ? nodes[i].offsetHeight : 0) - zero,
                     });
                 }
+                // const nodesArray = Array.prototype.slice.call(nodes);
+                // console.log(nodesArray.map(n => n.style.willChange));
 
                 this.target.node.classList.add('slip-reordering');
                 this.target.node.style.zIndex = '99999';
@@ -288,6 +292,7 @@ export const Slip = (function(){
                         });
                         otherNodes.forEach(function(o){
                             o.node.style[transformJSPropertyName] = o.baseTransform.original;
+                            o.node.style.willChange = null;
                             o.node.style[transitionJSPropertyName] = ''; // FIXME: animate to new position
                         });
                     },
@@ -628,7 +633,7 @@ export const Slip = (function(){
 
             // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.1s ease-out';
             // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.0s';
-            target.node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
+            // target.node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
             setTimeout(function(){
                 target.node.style[transitionJSPropertyName] = '';
                 target.node.style[transformJSPropertyName] = target.baseTransform.original;
