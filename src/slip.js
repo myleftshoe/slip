@@ -253,6 +253,7 @@ export default (function(){
                 function onMove() {
                     /*jshint validthis:true */
                     requestAnimationFrame(() => {
+                        if (!this.target) return;
                         this.updateScrolling();
 
                         if (mouseOutsideTimer) {
@@ -587,6 +588,7 @@ export default (function(){
         },
 
         getTotalMovement: function() {
+            if (!this.target) return;
             const scrollOffset = this.target.scrollContainer.scrollTop - this.target.origScrollTop;
             return {
                 x: this.latestPosition.x - this.startPosition.x,
