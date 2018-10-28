@@ -98,6 +98,7 @@ export default (function(){
         this.onMouseLeave = this.onMouseLeave.bind(this);
         this.onSelection = this.onSelection.bind(this);
         this.onContainerFocus = this.onContainerFocus.bind(this);
+        this.onContextMenu = this.onContextMenu.bind(this);
 
         this.setState(this.states.idle);
         this.attach(container);
@@ -221,6 +222,9 @@ export default (function(){
                 }
 
                 this.target.height = this.target.node.offsetHeight;
+
+                const {clientHeight, clientTop, scrollHeight, offsetHeight} = this.target.node;
+                console.log(clientHeight, clientTop, scrollHeight, offsetHeight);
 
                 const nodes = this.container.childNodes;
                 const originalIndex = findIndex(this.target, nodes);
@@ -360,6 +364,7 @@ export default (function(){
             this.container.addEventListener('touchmove', this.onTouchMove, {passive:false, capture: false});
             this.container.addEventListener('touchend', this.onTouchEnd, {passive:false, capture: false});
             this.container.addEventListener('mousedown', this.onMouseDown, {passive:true, capture: false});
+            this.container.addEventListener('contextmenu', this.onContextMenu, {passive:false, capture: false});
             // mousemove and mouseup are attached dynamically
         },
 
@@ -371,6 +376,7 @@ export default (function(){
             this.container.removeEventListener('touchmove', this.onTouchMove, {passive:false, capture: false});
             this.container.removeEventListener('touchstart', this.onTouchStart, {passive:true, capture: false});
             this.container.removeEventListener('touchcancel', this.cancel, {passive:true, capture: false});
+            this.container.removeEventListener('contextmenu', this.onContextMenu, {passive:true, capture: false});
 
             document.removeEventListener("selectionchange", this.onSelection, {passive:false, capture: false});
 
@@ -573,6 +579,11 @@ export default (function(){
             } else if (this.state.onEnd && false === this.state.onEnd.call(this)) {
                 e.preventDefault();
             }
+        },
+
+        onContextMenu: function(e) {
+            e.preventDefault();
+            e.stopPropagation();
         },
 
         getTotalMovement: function() {

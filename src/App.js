@@ -25,6 +25,9 @@ class App extends Component {
     this.list.addEventListener('slip:beforereorder', e => {
       this.setState({reordering: true});
     });    
+    // this.list.addEventListener('slip:beforewait', e => {
+    //   e.preventDefault();
+    // });       
   }
 
   reverse = () => {
@@ -34,7 +37,7 @@ class App extends Component {
   render() {
     const { items } = this.state;
     return (
-      <div className="App" onContextMenu={stopEvent}>
+      <div className="App" >
         <button onClick={this.reverse}>Reverse</button>
         <div className="draggable-container" ref={this.setListRef}>
           <FlipMove typeName={null} disableAllAnimations={this.state.reordering}>
@@ -53,13 +56,6 @@ class ListItem extends PureComponent {
     const { children } = this.props;
     return <div className="draggable-item" >{children}</div>
   }
-}
-
-
-const stopEvent = e => {
-  console.log("stopping event", e);
-  e.preventDefault();
-  e.stopPropagation();
 }
 
 const reorder = (arr, oldIndex, newIndex) => {
