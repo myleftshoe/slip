@@ -228,7 +228,7 @@ export const Slip = (function(){
                 const zero = this.target.node.offsetTop + this.target.height/2;
                 const otherNodes = [];
                 for(let i=0; i < nodes.length; i++) {
-                    if (nodes[i].nodeType !== 1 || nodes[i] === this.target.node || i < originalIndex) continue;
+                    if (nodes[i].nodeType !== 1 || nodes[i] === this.target.node) continue;
                     const t = nodes[i].offsetTop;
                     nodes[i].style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.2s ease-in-out';
                     if (i > originalIndex)
@@ -633,7 +633,7 @@ export const Slip = (function(){
 
             // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.1s ease-out';
             // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.0s';
-            // target.node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
+            target.node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
             setTimeout(function(){
                 target.node.style[transitionJSPropertyName] = '';
                 target.node.style[transformJSPropertyName] = target.baseTransform.original;
