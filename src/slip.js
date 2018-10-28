@@ -71,7 +71,7 @@
     USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-export const Slip = (function(){
+export default (function(){
 
     // -webkit-mess
     const testElementStyle = document.createElement('div').style;

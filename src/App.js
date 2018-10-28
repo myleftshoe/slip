@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react';
-import {Slip} from './slip';
+import Slip from './slip';
 import FlipMove from 'react-flip-move';
 import './App.css';
 
