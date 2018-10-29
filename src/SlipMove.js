@@ -55,7 +55,7 @@ export default class extends Component {
     */
     style.position = (style.position || 'static') === 'static' ? 'relative' : null; 
     return (
-        <div ref={this.init} style={{...style}}>
+        <div id="container" ref={this.init} style={{...style}}>
             <FlipMove typeName={null} { ...flipMoveProps } disableAllAnimations={this.state.reordering} >
                 {children}
             </FlipMove>
