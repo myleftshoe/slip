@@ -10,7 +10,8 @@ export default class extends Component {
     onMove: PropTypes.func,
     onMoveStart: PropTypes.func,
     disableMove: PropTypes.bool,
-    flipMoveProps: PropTypes.object
+    flipMoveProps: PropTypes.object,
+    style: PropTypes.object
   };
 
   state = {
@@ -46,11 +47,17 @@ export default class extends Component {
   }
 
   render() {
-    const { children, flipMoveProps } = this.props;
-    console.log('render', children);
+    const { children, flipMoveProps, style = {} } = this.props;
+    /*
+        'Wrapperless' FlipMove is used here to pass container props down but it requires a
+        non static position => override if static or not defined (css defaults to static). 
+        (FlipMove overrides it anyway but shows a console warning.)
+    */
+    style.position = (style.position || 'static') === 'static' ? 'relative' : null; 
+    console.log(style);
     return (
-        <div className="draggable-container" ref={this.init}>
-            <FlipMove typeName={null} disableAllAnimations={this.state.reordering} { ...flipMoveProps }>
+        <div ref={this.init} style={{...style}}>
+            <FlipMove typeName={null} { ...flipMoveProps } disableAllAnimations={this.state.reordering} >
                 {children}
             </FlipMove>
         </div>

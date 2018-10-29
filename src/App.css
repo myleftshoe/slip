@@ -2,6 +2,7 @@ body {
   touch-action: pan-y; /* allow vertical scroll but prevent swipe to go back in msEdge */
 }
 
+/* not required - in SlipMove instead */
 .draggable-container {
   position: relative; /* Required by react-flip-move - uncomment it to see console warning */
 }
