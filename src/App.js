@@ -39,7 +39,7 @@ class App extends Component {
 class ListItem extends PureComponent {
   render() {
     const { children } = this.props;
-    return <div className="draggable-item" >{children}</div>
+    return <div className="list-item" >{children}</div>
   }
 }
 

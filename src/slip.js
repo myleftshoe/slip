@@ -12,7 +12,7 @@
 
         • slip:beforereorder
             When reordering movement starts.
-            Element being reordered gets class `slip-reordering`.
+            Element being reordered gets class `slip-dragging`.
             If you execute event.preventDefault() then the element will not move at all.
 
         • slip:beforewait
@@ -247,7 +247,7 @@ export default (function(){
                 // const nodesArray = Array.prototype.slice.call(nodes);
                 // console.log(nodesArray.map(n => n.style.willChange));
 
-                node.classList.add('slip-reordering');
+                node.classList.add('slip-dragging');
                 node.style.zIndex = '99999';
                 node.style[userSelectJSPropertyName] = 'none';
 
@@ -293,7 +293,7 @@ export default (function(){
                             this.container.focus();
                         }
 
-                        // this.target.node.classList.remove('slip-reordering');
+                        // this.target.node.classList.remove('slip-dragging');
                         this.target.node.style[userSelectJSPropertyName] = '';
 
                         this.animateToZero(function(target){
@@ -654,10 +654,10 @@ export default (function(){
             setTimeout(function(){
                 target.node.style[transitionJSPropertyName] = '';
                 target.node.style[transformJSPropertyName] = target.baseTransform.original;
-                target.node.classList.remove('slip-reordering');
-                target.node.classList.add('slip-reordered');
+                target.node.classList.remove('slip-dragging');
+                target.node.classList.add('slip-dropping');
                 const fn = e => {
-                    target.node.classList.remove('slip-reordered');
+                    target.node.classList.remove('slip-dropping');
                     target.node.removeEventListener("transitionend", fn, false);
                 }
                 target.node.addEventListener("transitionend", fn, false);

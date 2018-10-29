@@ -3,11 +3,11 @@ body {
 }
 
 /* not required - in SlipMove instead */
-.draggable-container {
+.list {
   position: relative; /* Required by react-flip-move - uncomment it to see console warning */
 }
 
-.draggable-item {
+.list-item {
   position: relative; /* ensures that item is above all others in chrome */
   height: 50px;
   width: 100%;
@@ -23,7 +23,7 @@ body {
   will-change: transform;
 }
 
-.slip-reordering {
+.slip-dragging {
   transition-property: box-shadow, background-color;
   transition-duration: .18s;
   transition-timing-function: ease;
@@ -34,7 +34,7 @@ body {
   cursor: ns-resize;
 }
 
-.slip-reordered {
+.slip-dropping {
   transition-property: box-shadow, background-color;
   transition-duration: 0.18s;
   transition-timing-function: ease;
