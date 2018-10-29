@@ -1,17 +1,19 @@
-export const move = (arr, oldIndex, newIndex) => {
-    if (oldIndex === null && newIndex === null) return arr;
-    const result = [...arr];
-    let item = null;
-  
-    if (oldIndex !== null) {
-        item = result.splice(oldIndex, 1)[0];
+export const move = (arr, removeFrom=null, insertAt=null) => {
+    /*
+        Adds item if removeFrom is null
+        Removes item if insertAt is null
+    */
+    if (insertAt === removeFrom) return arr;
+    if (isNaN(Number(removeFrom) || isNaN(Number(insertAt)))) return arr;
+
+    let _arr = [...arr];
+
+    const item = (removeFrom !== null) ? _arr.splice(removeFrom, 1)[0] : null; 
+    if (insertAt !== null) {
+        _arr.splice(insertAt, 0, item);
     }
-  
-    if (newIndex !== null) {
-        result.splice(newIndex, 0, item);
-    }
-  
-    return result;
+
+    return _arr;
   };
     
 export const shuffle = arr => arr

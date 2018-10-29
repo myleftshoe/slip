@@ -17,17 +17,9 @@ class App extends Component {
     items: generateItems(10),
   }
   
-  move = ({oldIndex, newIndex}) => {
-    this.setState(actions.move(oldIndex, newIndex));
-  }
-
-  reverse = () => {
-    this.setState(actions.reverse);
-  }
-
-  shuffle = () => {
-    this.setState(actions.shuffle);
-  }
+  move = ({oldIndex, newIndex}) => this.setState(actions.move(oldIndex, newIndex));
+  reverse = () => this.setState(actions.reverse);
+  shuffle = () => this.setState(actions.shuffle);
 
   render() {
     const { items } = this.state;
