@@ -20,7 +20,7 @@ class App extends Component {
       console.log(e);
       const { originalIndex: oldIndex, spliceIndex: newIndex } = e.detail;
       const items = reorder(this.state.items, oldIndex, newIndex);
-      this.setState({items, reordering:false});
+      this.setState({items}, () => this.setState({reordering:false}));
     });    
     this.list.addEventListener('slip:beforereorder', e => {
       this.setState({reordering: true});
