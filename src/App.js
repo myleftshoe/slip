@@ -11,7 +11,7 @@ const actions = {
   move: (oldIndex, newIndex) => ({items}) => ({items: move(items, oldIndex, newIndex)}),
 }
 
-class App extends Component {
+export default class extends Component {
 
   state = {
     items: generateItems(10),
@@ -27,7 +27,7 @@ class App extends Component {
       <div className="App" >
         <button onClick={this.reverse}>Reverse</button>
         <button onClick={this.shuffle}>Shuffle</button>
-        <SlipMove onMoveEnd={this.move} flipMoveProps={{appearAnimation: 'fade'}}>
+        <SlipMove onMoveEnd={this.move} flipMoveProps={{appearAnimation: 'fade'}} >
           {items.map(item => <ListItem key={item}>{item}</ListItem>)}
         </SlipMove>
       </div>
@@ -42,5 +42,3 @@ class ListItem extends PureComponent {
     return <div className="list-item" >{children}</div>
   }
 }
-
-export default App;

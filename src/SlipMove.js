@@ -12,8 +12,13 @@ export default class extends Component {
     onMoveStart: PropTypes.func,
     disableMove: PropTypes.bool,
     flipMoveProps: PropTypes.object,
+    elevateItem: PropTypes.bool,
     style: PropTypes.object
   };
+
+  static defaultProps = {
+    elevateItem: true
+  }
 
   state = {
     reordering: false
@@ -37,7 +42,7 @@ export default class extends Component {
   container = null;
   init = node => {
     this.container = node;
-    new Slip(this.container, { raised: true, draggingClassName: 'slipmove-dragging' });
+    new Slip(this.container, { raised: this.props.elevateItem, draggingClassName: 'slipmove-dragging' });
     this.container.addEventListener('slip:beforereorder', this.handleBeforeReorder);
     this.container.addEventListener('slip:reorder', this.handleReorder);    
   }
