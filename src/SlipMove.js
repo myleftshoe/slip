@@ -59,7 +59,8 @@ export default class extends Component {
         non static position => override if static or not defined (css defaults to static). 
         (FlipMove overrides it anyway but shows a console warning.)
     */
-    style.position = (style.position || 'static') === 'static' ? 'relative' : null; 
+    if ((style.position || 'static') === 'static') style.position = 'relative'; 
+    
     return (
         <div id="container" ref={this.init} style={{...style}}>
             <FlipMove typeName={null} { ...flipMoveProps } disableAllAnimations={this.state.reordering} >

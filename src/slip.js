@@ -274,7 +274,6 @@ export default (function(){
                         const height = this.target.height; // +2 for margin
                         otherNodes.forEach(function(o){
                             let off = 0;
-                            console.log(off)
                             if (o.pos < 0 && move.y < 0 && o.pos > move.y) {
                                 off = height;
                             }
