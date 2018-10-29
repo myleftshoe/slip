@@ -13,9 +13,7 @@ const actions = {
 
 export default class extends Component {
 
-  state = {
-    items: generateItems(10),
-  }
+  state = { items: generateItems(10) }
   
   move = ({oldIndex, newIndex}) => this.setState(actions.move(oldIndex, newIndex));
   reverse = () => this.setState(actions.reverse);
