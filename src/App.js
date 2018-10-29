@@ -1,78 +1,54 @@
 import React, { Component, PureComponent } from 'react';
-import Slip from './slip';
-import FlipMove from 'react-flip-move';
+import SlipMove from './SlipMove';
 import './App.css';
+import { move, shuffle, reverse } from './array';
 
 const generateItems = length => [...Array(length).keys()].map(k => `Item ${k}`)
+
+const actions = {
+  reverse: ({items}) => ({items: reverse(items)}),
+  shuffle: ({items}) => ({items: shuffle(items)}),
+  move: (oldIndex, newIndex) => ({items}) => ({items: move(items, oldIndex, newIndex)}),
+}
 
 class App extends Component {
 
   state = {
-    items: generateItems(80),
-    reordering: false
+    items: generateItems(10),
   }
   
-  setListRef = el => {
-    this.list = el;
-    console.log(this.list);
-    new Slip(this.list);
-    this.list.addEventListener('slip:reorder', e => {
-      console.log(e);
-      const { originalIndex: oldIndex, spliceIndex: newIndex } = e.detail;
-      const items = reorder(this.state.items, oldIndex, newIndex);
-      this.setState({items}, () => this.setState({reordering:false}));
-    });    
-    this.list.addEventListener('slip:beforereorder', e => {
-      this.setState({reordering: true});
-    });    
-    // this.list.addEventListener('slip:beforewait', e => {
-    //   e.preventDefault();
-    // });       
+  move = ({oldIndex, newIndex}) => {
+    this.setState(actions.move(oldIndex, newIndex));
   }
 
   reverse = () => {
-    this.setState({items: [...this.state.items].reverse()});
-    // this.setState({items: reorder(this.state.items,2,7)});
+    this.setState(actions.reverse);
   }
+
+  shuffle = () => {
+    this.setState(actions.shuffle);
+  }
+
   render() {
     const { items } = this.state;
     return (
       <div className="App" >
         <button onClick={this.reverse}>Reverse</button>
-        <div className="draggable-container" ref={this.setListRef}>
-          <FlipMove typeName={null} disableAllAnimations={this.state.reordering}>
-            {items.map(item => <ListItem key={item}>{item}</ListItem>)}
-          </FlipMove>
-        </div>
+        <button onClick={this.shuffle}>Shuffle</button>
+        <SlipMove onMoveEnd={this.move}>
+          {items.map(item => <ListItem key={item}>{item}</ListItem>)}
+        </SlipMove>
       </div>
     );
   }
 }
 
-// const ListItem = ({children}) => <div className="draggable-item" >{children}</div>
-
+// FlipMove requires class compoonents as children
 class ListItem extends PureComponent {
   render() {
     const { children } = this.props;
     return <div className="draggable-item" >{children}</div>
   }
 }
-
-const reorder = (arr, oldIndex, newIndex) => {
-  if (oldIndex === null && newIndex === null) return arr;
-
-  const result = [...arr];
-  let item = null;
-
-  if (oldIndex !== null) {
-      item = result.splice(oldIndex, 1)[0];
-  }
-
-  if (newIndex !== null) {
-      result.splice(newIndex, 0, item);
-  }
-
-  return result;
-};
 
 export default App;
