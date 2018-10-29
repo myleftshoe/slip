@@ -4,7 +4,6 @@ export const move = (arr, removeFrom=null, insertAt=null) => {
         Removes item if insertAt is null
     */
     if (insertAt === removeFrom) return arr;
-    if (!Array.isArray(arr)) return arr;
     if (isNaN(Number(removeFrom) || isNaN(Number(insertAt)))) return arr;
 
     let _arr = [...arr];
