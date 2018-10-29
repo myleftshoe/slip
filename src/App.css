@@ -1,5 +1,7 @@
 body {
   touch-action: pan-y; /* allow vertical scroll but prevent swipe to go back in msEdge */
+  background-color: cadetblue;
+  font-family: Roboto
 }
 
 /* not required - in SlipMove instead */
@@ -24,6 +26,6 @@ body {
 }
 
 .slipmove-dragging {
-  background-color: lightgrey;
+  background-color: orange;
 }
 
