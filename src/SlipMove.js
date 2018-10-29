@@ -43,7 +43,7 @@ export default class extends Component {
 
   componentWillUnmount() {
     this.container.removeEventListener('slip:beforereorder', this.handleBeforeReorder);
-    this.container.removeEventListener('slip:reorder', this.onReorder);    
+    this.container.removeEventListener('slip:reorder', this.handleReorder);    
   }
 
   render() {
