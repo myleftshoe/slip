@@ -2,6 +2,7 @@ import React, { Component, PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Slip from './slip';
 import FlipMove from 'react-flip-move';
+import './slip.css';
 
 export default class extends Component {
 
@@ -36,7 +37,7 @@ export default class extends Component {
   container = null;
   init = node => {
     this.container = node;
-    new Slip(this.container);
+    new Slip(this.container, { raised: true, draggingClassName: 'slipmove-dragging' });
     this.container.addEventListener('slip:beforereorder', this.handleBeforeReorder);
     this.container.addEventListener('slip:reorder', this.handleReorder);    
   }

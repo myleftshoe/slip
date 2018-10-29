@@ -81,10 +81,12 @@ export default (function(){
     const transformCSSPropertyName = transformJSPropertyName === "webkitTransform" ? "-webkit-transform" : "transform";
     const userSelectJSPropertyName = "userSelect" in testElementStyle ? "userSelect" : "webkitUserSelect";
 
-    function Slip(container) {
+    function Slip(container, options = { raised: true }) {
         if ('string' === typeof container) container = document.querySelector(container);
         if (!container || !container.addEventListener) throw new Error("Please specify DOM node to attach to");
-
+        
+        this.options = options;
+        
         if (!this || this === window) return new Slip(container);
 
         // Functions used for as event handlers need usable `this` and must not change to be removable
@@ -246,8 +248,11 @@ export default (function(){
                 }
                 // const nodesArray = Array.prototype.slice.call(nodes);
                 // console.log(nodesArray.map(n => n.style.willChange));
-
                 node.classList.add('slip-dragging');
+                if (this.options.draggingClassName)
+                    node.classList.add(this.options.draggingClassName);
+                if (this.options.raised)
+                    node.classList.add('slip-shadow');
                 node.style.zIndex = '99999';
                 node.style[userSelectJSPropertyName] = 'none';
 
@@ -647,20 +652,22 @@ export default (function(){
         animateToZero: function(callback, target) {
             // save, because this.target/container could change during animation
             target = target || this.target;
-
+            let node = target.node;
             // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.1s ease-out';
             // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.0s';
-            target.node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
+            node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
             setTimeout(function(){
-                target.node.style[transitionJSPropertyName] = '';
-                target.node.style[transformJSPropertyName] = target.baseTransform.original;
-                target.node.classList.remove('slip-dragging');
-                target.node.classList.add('slip-dropping');
+                node.style[transitionJSPropertyName] = '';
+                node.style[transformJSPropertyName] = target.baseTransform.original;
+                node.classList.remove(this.options.draggingClassName);                
+                node.classList.remove('slip-dragging');
+                node.classList.remove('slip-shadow');
+                node.classList.add('slip-dropping');
                 const fn = e => {
-                    target.node.classList.remove('slip-dropping');
-                    target.node.removeEventListener("transitionend", fn, false);
+                    node.classList.remove('slip-dropping');
+                    node.removeEventListener("transitionend", fn, false);
                 }
-                target.node.addEventListener("transitionend", fn, false);
+                node.addEventListener("transitionend", fn, false);
                 if (callback) callback.call(this, target);
             }.bind(this), 100);
         },
