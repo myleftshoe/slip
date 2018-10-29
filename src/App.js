@@ -27,7 +27,7 @@ class App extends Component {
       <div className="App" >
         <button onClick={this.reverse}>Reverse</button>
         <button onClick={this.shuffle}>Shuffle</button>
-        <SlipMove onMoveEnd={this.move}>
+        <SlipMove onMoveEnd={this.move} flipMoveProps={{appearAnimation: 'elevator'}}>
           {items.map(item => <ListItem key={item}>{item}</ListItem>)}
         </SlipMove>
       </div>

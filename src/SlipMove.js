@@ -10,6 +10,7 @@ export default class extends Component {
     onMove: PropTypes.func,
     onMoveStart: PropTypes.func,
     disableMove: PropTypes.bool,
+    flipMoveProps: PropTypes.object
   };
 
   state = {
@@ -45,11 +46,11 @@ export default class extends Component {
   }
 
   render() {
-    const { children } = this.props;
+    const { children, flipMoveProps } = this.props;
     console.log('render', children);
     return (
         <div className="draggable-container" ref={this.init}>
-            <FlipMove typeName={null} disableAllAnimations={this.state.reordering} appearAnimation="accordionVertical">
+            <FlipMove typeName={null} disableAllAnimations={this.state.reordering} { ...flipMoveProps }>
                 {children}
             </FlipMove>
         </div>
