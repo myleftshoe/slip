@@ -168,9 +168,12 @@ export default (function(){
             },
 
             undecided: function undecidedStateInit() {
-                this.target.height = this.target.node.offsetHeight;
-                this.target.node.style.willChange = transformCSSPropertyName;
-                this.target.node.style[transitionJSPropertyName] = '';
+
+                let node = this.target.node;
+                const { marginTop, marginBottom } = window.getComputedStyle(node);
+                this.target.height = node.offsetHeight + Math.max(parseInt(marginTop), parseInt(marginBottom));
+                node.style.willChange = transformCSSPropertyName;
+                node.style[transitionJSPropertyName] = '';
                 
                 let holdTimer;
                 if (!this.dispatch(this.target.originalTarget, 'beforewait')) {
@@ -217,22 +220,20 @@ export default (function(){
             },
 
             reorder: function reorderStateInit() {
-                if (this.target.node.focus) {
-                    this.target.node.focus();
-                }
 
-                this.target.height = this.target.node.offsetHeight;
+                let node = this.target.node;
+                node.focus && node.focus();
 
-                const {clientHeight, clientTop, scrollHeight, offsetHeight} = this.target.node;
-                console.log(clientHeight, clientTop, scrollHeight, offsetHeight);
-
+                const { marginTop, marginBottom } = window.getComputedStyle(node);
+                this.target.height = node.offsetHeight + Math.max(parseInt(marginTop), parseInt(marginBottom));
+                
                 const nodes = this.container.childNodes;
                 const originalIndex = findIndex(this.target, nodes);
                 let mouseOutsideTimer;
-                const zero = this.target.node.offsetTop + this.target.height/2;
+                const zero = node.offsetTop + this.target.height/2;
                 const otherNodes = [];
                 for(let i=0; i < nodes.length; i++) {
-                    if (nodes[i].nodeType !== 1 || nodes[i] === this.target.node) continue;
+                    if (nodes[i].nodeType !== 1 || nodes[i] === node) continue;
                     const t = nodes[i].offsetTop;
                     nodes[i].style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.2s ease-in-out';
                     if (i > originalIndex)
@@ -246,12 +247,13 @@ export default (function(){
                 // const nodesArray = Array.prototype.slice.call(nodes);
                 // console.log(nodesArray.map(n => n.style.willChange));
 
-                this.target.node.classList.add('slip-reordering');
-                this.target.node.style.zIndex = '99999';
-                this.target.node.style[userSelectJSPropertyName] = 'none';
+                node.classList.add('slip-reordering');
+                node.style.zIndex = '99999';
+                node.style[userSelectJSPropertyName] = 'none';
 
                 function onMove() {
-                    /*jshint validthis:true */
+
+                        /*jshint validthis:true */
                     requestAnimationFrame(() => {
                         if (!this.target) return;
                         this.updateScrolling();
@@ -264,9 +266,10 @@ export default (function(){
                         const move = this.getTotalMovement();
                         this.target.node.style[transformJSPropertyName] = 'translate(0,' + move.y + 'px) ' + this.target.baseTransform.value;
 
-                        const height = this.target.height + 2; // +2 for margin
+                        const height = this.target.height; // +2 for margin
                         otherNodes.forEach(function(o){
                             let off = 0;
+                            console.log(off)
                             if (o.pos < 0 && move.y < 0 && o.pos > move.y) {
                                 off = height;
                             }

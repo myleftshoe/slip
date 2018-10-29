@@ -54,7 +54,6 @@ export default class extends Component {
         (FlipMove overrides it anyway but shows a console warning.)
     */
     style.position = (style.position || 'static') === 'static' ? 'relative' : null; 
-    console.log(style);
     return (
         <div ref={this.init} style={{...style}}>
             <FlipMove typeName={null} { ...flipMoveProps } disableAllAnimations={this.state.reordering} >
