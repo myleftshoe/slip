@@ -85,9 +85,9 @@ export default (function(){
         if ('string' === typeof container) container = document.querySelector(container);
         if (!container || !container.addEventListener) throw new Error("Please specify DOM node to attach to");
         
-        this.options = options;
-        
         if (!this || this === window) return new Slip(container);
+
+        this.options = options;
 
         // Functions used for as event handlers need usable `this` and must not change to be removable
         this.cancel = this.setState.bind(this, this.states.idle);
