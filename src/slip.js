@@ -651,18 +651,17 @@ export default (function(){
             // save, because this.target/container could change during animation
             target = target || this.target;
             let node = target.node;
-            node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
+            // const translateY = parseInt(window.getComputedStyle(node).getPropertyValue(transformJSPropertyName).split(",")[5]);
             node.style[transitionJSPropertyName] = '';
             node.style[transformJSPropertyName] = target.baseTransform.original;
             node.classList.remove(this.options.draggingClassName);        
             node.classList.remove('slip-dragging');
             node.classList.remove('slip-shadow');
             node.classList.add('slip-dropping');
-            
-            function removeDropAnimation(e) {
-                console.log(this);
-                this.classList.remove('slip-dropping');
-                this.removeEventListener("transitionend", removeDropAnimation, false);
+
+            const removeDropAnimation = e =>  {
+                node.classList.remove('slip-dropping');
+                node.removeEventListener("transitionend", removeDropAnimation, false);
                 if (callback) callback.call(this, target);
             }
             node.addEventListener("transitionend", removeDropAnimation, false);

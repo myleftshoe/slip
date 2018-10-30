@@ -1,5 +1,5 @@
 .slip-dragging {
-    transition-property: box-shadow, background-color;
+    transition-property: box-shadow, background-color, translate;
     transition-duration: .18s;
     transition-timing-function: ease;
     /* background-color: gray !important;    */
