@@ -15,6 +15,6 @@
 .slip-dropping {
     transition-property: box-shadow, background-color;
     transition-delay: 0.18s;
-    transition-duration: 0.18s;
+    transition-duration: .18s;
     transition-timing-function: ease;
 }

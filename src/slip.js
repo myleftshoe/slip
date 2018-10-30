@@ -297,7 +297,6 @@ export default (function(){
                             this.container.focus();
                         }
 
-                        // this.target.node.classList.remove('slip-dragging');
                         this.target.node.style[userSelectJSPropertyName] = '';
 
                         this.animateToZero(function(target){
@@ -655,11 +654,19 @@ export default (function(){
             node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
             node.style[transitionJSPropertyName] = '';
             node.style[transformJSPropertyName] = target.baseTransform.original;
-            node.classList.remove(this.options.draggingClassName);                
+            node.classList.remove(this.options.draggingClassName);        
             node.classList.remove('slip-dragging');
             node.classList.remove('slip-shadow');
             node.classList.add('slip-dropping');
-            if (callback) callback.call(this, target);
+            
+            function removeDropAnimation(e) {
+                console.log(this);
+                this.classList.remove('slip-dropping');
+                this.removeEventListener("transitionend", removeDropAnimation, false);
+                if (callback) callback.call(this, target);
+            }
+            node.addEventListener("transitionend", removeDropAnimation, false);
+            
         },
     };
 
