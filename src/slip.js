@@ -652,23 +652,14 @@ export default (function(){
             // save, because this.target/container could change during animation
             target = target || this.target;
             let node = target.node;
-            // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.1s ease-out';
-            // target.node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.0s';
             node.style[transformJSPropertyName] = 'translate(0,0) ' + target.baseTransform.value;
-            setTimeout(function(){
-                node.style[transitionJSPropertyName] = '';
-                node.style[transformJSPropertyName] = target.baseTransform.original;
-                node.classList.remove(this.options.draggingClassName);                
-                node.classList.remove('slip-dragging');
-                node.classList.remove('slip-shadow');
-                node.classList.add('slip-dropping');
-                const fn = e => {
-                    node.classList.remove('slip-dropping');
-                    node.removeEventListener("transitionend", fn, false);
-                }
-                node.addEventListener("transitionend", fn, false);
-                if (callback) callback.call(this, target);
-            }.bind(this), 100);
+            node.style[transitionJSPropertyName] = '';
+            node.style[transformJSPropertyName] = target.baseTransform.original;
+            node.classList.remove(this.options.draggingClassName);                
+            node.classList.remove('slip-dragging');
+            node.classList.remove('slip-shadow');
+            node.classList.add('slip-dropping');
+            if (callback) callback.call(this, target);
         },
     };
 
