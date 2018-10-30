@@ -1,5 +1,5 @@
 .slip-dragging {
-    transition-property: box-shadow, background-color, translate;
+    transition-property: box-shadow, background-color;
     transition-duration: .18s;
     transition-timing-function: ease;
     /* background-color: gray !important;    */
@@ -14,7 +14,7 @@
   
 .slip-dropping {
     transition-property: box-shadow, background-color;
-    transition-delay: 0.18s;
+    transition-delay: .18s;
     transition-duration: .18s;
     transition-timing-function: ease;
 }
