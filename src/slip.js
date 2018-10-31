@@ -339,13 +339,14 @@ export default (function(){
                             }
                             spliceIndex = i+1;
                         }
+                        this.target.relativeIndex = spliceIndex - originalIndex;
+                        console.log(spliceIndex, originalIndex, this.target.relativeIndex);
 
                         this.dispatch(this.target.node, 'reorder', {
                             spliceIndex: spliceIndex,
                             originalIndex: originalIndex,
                             insertBefore: otherNodes[spliceIndex] ? otherNodes[spliceIndex].node : null,
                         });
-
                         this.setState(this.states.idle);
                         return false;
                     },
@@ -650,21 +651,27 @@ export default (function(){
         animateToZero: function(callback, target) {
             // save, because this.target/container could change during animation
             target = target || this.target;
-            let node = target.node;
-            // const translateY = parseInt(window.getComputedStyle(node).getPropertyValue(transformJSPropertyName).split(",")[5]);
-            node.style[transitionJSPropertyName] = '';
-            node.style[transformJSPropertyName] = target.baseTransform.original;
-            node.classList.remove(this.options.draggingClassName);        
-            node.classList.remove('slip-dragging');
-            node.classList.remove('slip-shadow');
-            node.classList.add('slip-dropping');
 
-            const removeDropAnimation = e =>  {
-                node.classList.remove('slip-dropping');
-                node.removeEventListener("transitionend", removeDropAnimation, false);
-                if (callback) callback.call(this, target);
-            }
-            node.addEventListener("transitionend", removeDropAnimation, false);
+            const { node, height, relativeIndex } = target;
+            const translateY = parseInt(window.getComputedStyle(node).getPropertyValue(transformJSPropertyName).split(",")[5]);
+            const offsetY = translateY - height * relativeIndex;
+            console.log(height, translateY, node.style.transform);
+            node.style[transformJSPropertyName] = `translate(0px,${offsetY}px)`
+            console.log(height, translateY, node.style.transform);
+            setTimeout((node) => {
+                console.log(node)
+                node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.2s ease-in-out';
+                node.style[transformJSPropertyName] = target.baseTransform.original;
+                const animateDrop = e =>  {
+                    console.log("animateDrop");
+                    node.removeEventListener("transitionend", animateDrop, false);
+                    node.classList.remove(this.options.draggingClassName);        
+                    node.classList.remove('slip-dragging');
+                    node.classList.remove('slip-shadow');
+                    if (callback) callback.call(this, target);
+            }                
+                node.addEventListener("transitionend", animateDrop, false);
+            },0, node);
             
         },
     };
