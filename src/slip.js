@@ -678,7 +678,6 @@ export default (function(){
                 }                
                 node.addEventListener("transitionend", animateDrop, false);
             },0, node);
-            
         },
     };
 
