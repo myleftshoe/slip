@@ -655,21 +655,31 @@ export default (function(){
             const { node, height, relativeIndex } = target;
             const translateY = parseInt(window.getComputedStyle(node).getPropertyValue(transformJSPropertyName).split(",")[5]);
             const offsetY = translateY - height * relativeIndex;
-            console.log(height, translateY, node.style.transform);
+            console.log(height, translateY, node.style);
+            // By now item has moved to new location. Translate instantly to new position maintaining drag offset
             node.style[transformJSPropertyName] = `translate(0px,${offsetY}px)`
             console.log(height, translateY, node.style.transform);
+            // After translate, animate smoothly into place from offset 
             setTimeout((node) => {
                 console.log(node)
-                node.style[transitionJSPropertyName] = transformCSSPropertyName + ' 0.2s ease-in-out';
+                node.style.transitionProperty = 'all';
                 node.style[transformJSPropertyName] = target.baseTransform.original;
                 const animateDrop = e =>  {
-                    console.log("animateDrop");
-                    node.removeEventListener("transitionend", animateDrop, false);
-                    node.classList.remove(this.options.draggingClassName);        
-                    node.classList.remove('slip-dragging');
-                    node.classList.remove('slip-shadow');
-                    if (callback) callback.call(this, target);
-            }                
+                    if (node.classList.contains('slip-dragging')) {
+                        console.log("animateDrop1", node.classList);
+                        node.classList.remove(this.options.draggingClassName);
+                        node.classList.remove('slip-dragging');
+                        node.classList.remove('slip-shadow');
+                        node.classList.add('slip-dropping');
+                    }
+                    else {
+                        console.log("animateDrop2", node.classList);
+                        node.removeEventListener("transitionend", animateDrop, false);
+                        node.classList.remove('slip-dropping');
+                        if (callback) callback.call(this, target);
+                    }
+
+                }                
                 node.addEventListener("transitionend", animateDrop, false);
             },0, node);
             
