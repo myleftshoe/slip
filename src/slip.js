@@ -340,7 +340,6 @@ export default (function(){
                             spliceIndex = i+1;
                         }
                         this.target.relativeIndex = spliceIndex - originalIndex;
-                        console.log(spliceIndex, originalIndex, this.target.relativeIndex);
 
                         this.dispatch(this.target.node, 'reorder', {
                             spliceIndex: spliceIndex,
@@ -655,25 +654,22 @@ export default (function(){
             const { node, height, relativeIndex } = target;
             const translateY = parseInt(window.getComputedStyle(node).getPropertyValue(transformJSPropertyName).split(",")[5]);
             const offsetY = translateY - height * relativeIndex;
-            console.log(height, translateY, node.style);
+
             // By now item has moved to new location. Translate instantly to new position maintaining drag offset
             node.style[transformJSPropertyName] = `translate(0px,${offsetY}px)`
-            console.log(height, translateY, node.style.transform);
+
             // After translate, animate smoothly into place from offset 
             setTimeout((node) => {
-                console.log(node)
                 node.style.transitionProperty = 'all';
                 node.style[transformJSPropertyName] = target.baseTransform.original;
                 const animateDrop = e =>  {
                     if (node.classList.contains('slip-dragging')) {
-                        console.log("animateDrop1", node.classList);
                         node.classList.remove(this.options.draggingClassName);
                         node.classList.remove('slip-dragging');
                         node.classList.remove('slip-shadow');
                         node.classList.add('slip-dropping');
                     }
                     else {
-                        console.log("animateDrop2", node.classList);
                         node.removeEventListener("transitionend", animateDrop, false);
                         node.classList.remove('slip-dropping');
                         if (callback) callback.call(this, target);
